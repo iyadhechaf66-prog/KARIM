@@ -1,0 +1,836 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101b35">
+<title>ROBOKIDS SMART WHITEBOARD 3.0</title>
+
+<style>
+:root {
+  --navy:#101b35;
+  --navy2:#172748;
+  --blue:#2878ed;
+  --cyan:#23c7d9;
+  --bg:#eef2f8;
+  --text:#18243b;
+  --muted:#718096;
+  --border:#dce4ef;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Tahoma,Arial,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  min-height:100vh;
+}
+button,input { font:inherit; }
+button { cursor:pointer; }
+
+.header {
+  height:76px;
+  background:var(--navy);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 25px;
+  gap:15px;
+  box-shadow:0 4px 18px #0c183328;
+}
+.brand {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logo {
+  width:45px;
+  height:45px;
+  border-radius:13px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  display:grid;
+  place-items:center;
+  font-size:22px;
+  font-weight:bold;
+}
+.brand h1 {
+  margin:0;
+  font-size:19px;
+  letter-spacing:.4px;
+}
+.brand small {
+  display:block;
+  color:#a9c2e7;
+  font-size:11px;
+  margin-top:5px;
+}
+.header-right {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.status {
+  color:#a9e8d1;
+  font-size:12px;
+  padding:8px 12px;
+  border:1px solid #ffffff25;
+  border-radius:20px;
+}
+.header-btn {
+  border:1px solid #ffffff30;
+  color:white;
+  background:#ffffff12;
+  padding:10px 14px;
+  border-radius:9px;
+}
+.header-btn:hover { background:#ffffff25; }
+
+.layout {
+  display:grid;
+  grid-template-columns:245px minmax(0,1fr);
+  gap:17px;
+  padding:18px;
+  min-height:calc(100vh - 76px);
+}
+.sidebar {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:17px;
+  box-shadow:0 5px 18px #1b31500b;
+}
+.section-title {
+  font-size:13px;
+  font-weight:bold;
+  margin:3px 0 14px;
+  color:#43536e;
+}
+.tool-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.tool {
+  border:1px solid var(--border);
+  background:#f8faff;
+  border-radius:10px;
+  padding:12px 5px;
+  color:#33445f;
+  font-size:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:7px;
+  transition:.15s;
+}
+.tool span { font-size:21px; }
+.tool:hover { border-color:var(--blue); color:var(--blue); }
+.tool.active {
+  color:white;
+  background:var(--blue);
+  border-color:var(--blue);
+  box-shadow:0 4px 12px #2878ed35;
+}
+.control-group {
+  margin-top:22px;
+  border-top:1px solid var(--border);
+  padding-top:17px;
+}
+.control-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin:12px 0;
+  font-size:12px;
+  color:#52627b;
+}
+input[type="color"] {
+  width:42px;
+  height:30px;
+  border:0;
+  padding:0;
+  background:none;
+  cursor:pointer;
+}
+input[type="range"] { width:110px; }
+.action-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.action {
+  padding:10px 6px;
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:8px;
+  font-size:12px;
+  color:#34445e;
+}
+.action:hover { background:#f0f6ff; border-color:#9ebcf0; }
+.action.primary {
+  background:var(--blue);
+  border-color:var(--blue);
+  color:white;
+}
+.action.danger { color:#d64b4b; }
+
+.workspace { min-width:0; }
+.workspace-top {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:2px 0 13px;
+  flex-wrap:wrap;
+}
+.workspace-top h2 {
+  margin:0;
+  font-size:17px;
+}
+.workspace-top p {
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:11px;
+}
+.board-actions {
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+.board-actions button {
+  border:1px solid var(--border);
+  background:white;
+  padding:9px 12px;
+  border-radius:8px;
+  font-size:12px;
+  color:#35445c;
+}
+.board-actions button:hover {
+  border-color:var(--blue);
+  color:var(--blue);
+}
+.board-shell {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:10px;
+  box-shadow:0 7px 24px #1b315012;
+}
+.board-info {
+  display:flex;
+  justify-content:space-between;
+  color:#8491a5;
+  font-size:11px;
+  padding:2px 5px 10px;
+}
+.canvas-wrap {
+  width:100%;
+  height:calc(100vh - 220px);
+  min-height:440px;
+  max-height:850px;
+  background:white;
+  border:1px solid #e6ebf2;
+  border-radius:7px;
+  overflow:hidden;
+  position:relative;
+  touch-action:none;
+}
+canvas {
+  display:block;
+  width:100%;
+  height:100%;
+  cursor:crosshair;
+  touch-action:none;
+}
+.pagebar {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 3px 2px;
+  flex-wrap:wrap;
+}
+.pagebar button {
+  background:#f3f6fb;
+  border:1px solid var(--border);
+  padding:8px 12px;
+  border-radius:8px;
+  font-size:12px;
+}
+.pagebar button.selected {
+  background:#e7f0ff;
+  color:var(--blue);
+  border-color:#a9c6f3;
+}
+.footer-note {
+  text-align:center;
+  color:#8996aa;
+  font-size:10px;
+  padding:14px;
+}
+
+@media(max-width:850px) {
+  .layout { grid-template-columns:1fr; }
+  .sidebar { order:2; }
+  .workspace { order:1; }
+  .canvas-wrap { height:60vh; }
+  .header { padding:0 12px; }
+  .brand h1 { font-size:14px; }
+  .status { display:none; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="brand">
+    <div class="logo">R</div>
+    <div>
+      <h1>ROBOKIDS SMART WHITEBOARD</h1>
+      <small>ESPACE PÉDAGOGIQUE INTERACTIF · VERSION 3.0</small>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status">● الوضع المحلي نشط</div>
+    <button class="header-btn" onclick="saveLocal()">حفظ المشروع</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="section-title">أدوات السبورة</div>
+
+    <div class="tool-grid">
+      <button class="tool active" data-tool="pen" onclick="setTool('pen',this)">
+        <span>✏️</span>القلم
+      </button>
+      <button class="tool" data-tool="highlighter" onclick="setTool('highlighter',this)">
+        <span>🖍️</span>تمييز
+      </button>
+      <button class="tool" data-tool="eraser" onclick="setTool('eraser',this)">
+        <span>🧽</span>الممحاة
+      </button>
+      <button class="tool" data-tool="line" onclick="setTool('line',this)">
+        <span>📏</span>خط مستقيم
+      </button>
+      <button class="tool" data-tool="rect" onclick="setTool('rect',this)">
+        <span>▭</span>مستطيل
+      </button>
+      <button class="tool" data-tool="circle" onclick="setTool('circle',this)">
+        <span>⭕</span>دائرة
+      </button>
+      <button class="tool" data-tool="text" onclick="setTool('text',this)">
+        <span>🔤</span>كتابة نص
+      </button>
+    </div>
+
+    <div class="control-group">
+      <div class="section-title">خصائص القلم</div>
+
+      <div class="control-row">
+        <label for="color">اللون</label>
+        <input id="color" type="color" value="#1769e0">
+      </div>
+
+      <div class="control-row">
+        <label for="size">حجم القلم</label>
+        <input id="size" type="range" min="1" max="30" value="4">
+      </div>
+      <div class="control-row">
+        <label>السماكة</label>
+        <strong id="sizeValue">4 px</strong>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="section-title">التحكم في الرسم</div>
+      <div class="action-grid">
+        <button class="action" onclick="undo()">↶ تراجع</button>
+        <button class="action" onclick="redo()">↷ إعادة</button>
+        <button class="action danger" onclick="clearPage()">مسح الصفحة</button>
+        <button class="action" onclick="addPage()">＋ صفحة جديدة</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="section-title">الملفات والتصدير</div>
+      <div class="action-grid">
+        <button class="action" onclick="document.getElementById('imageFile').click()">🖼️ إضافة صورة</button>
+        <button class="action" onclick="exportPNG()">📷 تصدير PNG</button>
+        <button class="action" onclick="exportProject()">💾 نسخة JSON</button>
+        <button class="action" onclick="document.getElementById('projectFile').click()">📂 فتح مشروع</button>
+      </div>
+      <input id="imageFile" type="file" accept="image/*" hidden>
+      <input id="projectFile" type="file" accept=".json,application/json" hidden>
+    </div>
+
+    <div class="control-group">
+      <div class="section-title">حالة المشروع</div>
+      <div style="font-size:12px;color:#6b7b91;line-height:2">
+        <div>📄 الصفحات: <strong id="pageCount">1</strong></div>
+        <div>✍️ العناصر: <strong id="elementCount">0</strong></div>
+        <div>💻 الحفظ: محلي على هذا الجهاز</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="workspace">
+    <div class="workspace-top">
+      <div>
+        <h2>السبورة التعليمية التفاعلية</h2>
+        <p>ارسم، اكتب، أضف الصور، وأنشئ صفحات دروسك.</p>
+      </div>
+      <div class="board-actions">
+        <button onclick="undo()">↶ تراجع</button>
+        <button onclick="redo()">↷ إعادة</button>
+        <button onclick="saveLocal()">حفظ الآن</button>
+      </div>
+    </div>
+
+    <section class="board-shell">
+      <div class="board-info">
+        <span>ROBOKIDS · SMART CLASSROOM</span>
+        <span id="saveStatus">جاهز للعمل</span>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="board"></canvas>
+      </div>
+      <div class="pagebar" id="pagebar">
+        <span style="font-size:12px;color:#718096">الصفحات:</span>
+      </div>
+    </section>
+    <div class="footer-note">
+      ROBOKIDS SMART WHITEBOARD 3.0 · CREATE · LEARN · INNOVATE
+    </div>
+  </main>
+
+</div>
+
+<script>
+const canvas = document.getElementById("board");
+const ctx = canvas.getContext("2d");
+
+let pages = [[]];
+let currentPage = 0;
+let tool = "pen";
+let drawing = false;
+let startPoint = null;
+let draft = null;
+let undoStack = [];
+let redoStack = [];
+
+const colorInput = document.getElementById("color");
+const sizeInput = document.getElementById("size");
+
+function currentElements() {
+  return pages[currentPage];
+}
+
+function snapshot() {
+  undoStack.push(JSON.stringify(currentElements()));
+  if (undoStack.length > 50) undoStack.shift();
+  redoStack = [];
+}
+
+function updateCounters() {
+  document.getElementById("pageCount").textContent = pages.length;
+  document.getElementById("elementCount").textContent = currentElements().length;
+  renderPages();
+}
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+
+  canvas.width = Math.max(1, Math.round(rect.width * dpr));
+  canvas.height = Math.max(1, Math.round(rect.height * dpr));
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  render();
+}
+
+function renderElement(el) {
+  ctx.save();
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = el.color || "#1769e0";
+  ctx.fillStyle = el.color || "#1769e0";
+  ctx.lineWidth = el.size || 4;
+
+  if (el.type === "stroke") {
+    if (!el.points || !el.points.length) {
+      ctx.restore();
+      return;
+    }
+    ctx.globalAlpha = el.alpha || 1;
+    ctx.beginPath();
+    ctx.moveTo(el.points[0].x, el.points[0].y);
+    for (let i = 1; i < el.points.length; i++) {
+      ctx.lineTo(el.points[i].x, el.points[i].y);
+    }
+    ctx.stroke();
+  }
+
+  if (el.type === "line") {
+    ctx.beginPath();
+    ctx.moveTo(el.x1, el.y1);
+    ctx.lineTo(el.x2, el.y2);
+    ctx.stroke();
+  }
+
+  if (el.type === "rect") {
+    ctx.strokeRect(el.x, el.y, el.w, el.h);
+  }
+
+  if (el.type === "circle") {
+    ctx.beginPath();
+    ctx.ellipse(
+      el.x + el.w / 2,
+      el.y + el.h / 2,
+      Math.abs(el.w / 2),
+      Math.abs(el.h / 2),
+      0, 0, Math.PI * 2
+    );
+    ctx.stroke();
+  }
+
+  if (el.type === "text") {
+    ctx.fillStyle = el.color;
+    ctx.font = `${el.size * 5 + 12}px Tahoma, Arial`;
+    ctx.textBaseline = "top";
+    ctx.direction = "rtl";
+    ctx.fillText(el.text, el.x, el.y);
+  }
+
+  if (el.type === "image") {
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, el.x, el.y, el.w, el.h);
+    };
+    img.src = el.src;
+  }
+
+  ctx.restore();
+}
+
+function render() {
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, rect.width, rect.height);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, rect.width, rect.height);
+
+  currentElements().forEach(renderElement);
+  if (draft) renderElement(draft);
+  updateCounters();
+}
+
+function getPoint(e) {
+  const r = canvas.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
+function setTool(name, button) {
+  tool = name;
+  document.querySelectorAll(".tool").forEach(b => b.classList.remove("active"));
+  if (button) button.classList.add("active");
+
+  canvas.style.cursor = name === "text" ? "text" : "crosshair";
+}
+
+function pointerDown(e) {
+  e.preventDefault();
+  canvas.setPointerCapture(e.pointerId);
+
+  const p = getPoint(e);
+  drawing = true;
+  startPoint = p;
+
+  if (tool === "pen" || tool === "highlighter") {
+    snapshot();
+    draft = {
+      type: "stroke",
+      points: [p],
+      color: colorInput.value,
+      size: tool === "highlighter" ? Math.max(12, Number(sizeInput.value) * 3) : Number(sizeInput.value),
+      alpha: tool === "highlighter" ? 0.25 : 1
+    };
+  } else if (tool === "eraser") {
+    snapshot();
+    eraseAt(p);
+  } else if (tool === "text") {
+    drawing = false;
+    const value = prompt("اكتب النص الذي تريد إضافته:");
+    if (value && value.trim()) {
+      snapshot();
+      currentElements().push({
+        type:"text", x:p.x, y:p.y,
+        text:value.trim(),
+        color:colorInput.value,
+        size:Number(sizeInput.value)
+      });
+      finishChange();
+    }
+  } else {
+    draft = {
+      type:tool,
+      x:p.x, y:p.y, w:0, h:0,
+      x1:p.x, y1:p.y, x2:p.x, y2:p.y,
+      color:colorInput.value,
+      size:Number(sizeInput.value)
+    };
+  }
+  render();
+}
+
+function pointerMove(e) {
+  if (!drawing) return;
+  const p = getPoint(e);
+
+  if (tool === "pen" || tool === "highlighter") {
+    draft.points.push(p);
+  } else if (tool === "eraser") {
+    eraseAt(p);
+  } else if (draft) {
+    draft.w = p.x - startPoint.x;
+    draft.h = p.y - startPoint.y;
+    draft.x2 = p.x;
+    draft.y2 = p.y;
+  }
+  render();
+}
+
+function pointerUp() {
+  if (!drawing) return;
+  drawing = false;
+
+  if (draft) {
+    if (draft.type === "line") {
+      draft = {...draft, x1:startPoint.x, y1:startPoint.y};
+    }
+    currentElements().push(draft);
+    draft = null;
+  }
+  finishChange();
+}
+
+function eraseAt(p) {
+  const list = currentElements();
+  const radius = 22;
+
+  for (let i = list.length - 1; i >= 0; i--) {
+    const el = list[i];
+    let hit = false;
+
+    if (el.type === "stroke") {
+      hit = el.points.some(q => Math.hypot(q.x-p.x, q.y-p.y) < radius + el.size);
+    } else if (el.type === "text" || el.type === "image") {
+      hit = p.x >= el.x-radius && p.x <= el.x+(el.w || 150)+radius &&
+            p.y >= el.y-radius && p.y <= el.y+(el.h || 40)+radius;
+    } else {
+      const left = Math.min(el.x ?? el.x1, el.x2 ?? ((el.x || 0)+(el.w || 0)));
+      const right = Math.max(el.x ?? el.x1, el.x2 ?? ((el.x || 0)+(el.w || 0)));
+      const top = Math.min(el.y ?? el.y1, el.y2 ?? ((el.y || 0)+(el.h || 0)));
+      const bottom = Math.max(el.y ?? el.y1, el.y2 ?? ((el.y || 0)+(el.h || 0)));
+      hit = p.x >= left-radius && p.x <= right+radius &&
+            p.y >= top-radius && p.y <= bottom+radius;
+    }
+
+    if (hit) {
+      list.splice(i,1);
+      break;
+    }
+  }
+}
+
+function finishChange() {
+  draft = null;
+  render();
+  saveLocal();
+  document.getElementById("saveStatus").textContent = "تم تحديث السبورة";
+}
+
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(JSON.stringify(currentElements()));
+  pages[currentPage] = JSON.parse(undoStack.pop());
+  render();
+  saveLocal();
+}
+
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(JSON.stringify(currentElements()));
+  pages[currentPage] = JSON.parse(redoStack.pop());
+  render();
+  saveLocal();
+}
+
+function clearPage() {
+  if (!currentElements().length) return;
+  if (!confirm("هل تريد مسح جميع عناصر هذه الصفحة؟")) return;
+  snapshot();
+  pages[currentPage] = [];
+  finishChange();
+}
+
+function addPage() {
+  pages.push([]);
+  currentPage = pages.length - 1;
+  undoStack = [];
+  redoStack = [];
+  render();
+  saveLocal();
+}
+
+function selectPage(index) {
+  currentPage = index;
+  undoStack = [];
+  redoStack = [];
+  render();
+}
+
+function renderPages() {
+  const bar = document.getElementById("pagebar");
+  bar.innerHTML = '<span style="font-size:12px;color:#718096">الصفحات:</span>';
+
+  pages.forEach((page,index) => {
+    const b = document.createElement("button");
+    b.textContent = "صفحة " + (index+1);
+    if (index === currentPage) b.classList.add("selected");
+    b.onclick = () => selectPage(index);
+    bar.appendChild(b);
+  });
+}
+
+function saveLocal() {
+  try {
+    localStorage.setItem("robokids_whiteboard_v3", JSON.stringify({
+      pages, currentPage
+    }));
+    document.getElementById("saveStatus").textContent = "تم الحفظ على هذا الجهاز";
+  } catch (err) {
+    document.getElementById("saveStatus").textContent = "تعذر الحفظ: مساحة التخزين ممتلئة";
+  }
+}
+
+function loadLocal() {
+  try {
+    const saved = localStorage.getItem("robokids_whiteboard_v3");
+    if (!saved) return;
+    const data = JSON.parse(saved);
+    if (Array.isArray(data.pages) && data.pages.length) {
+      pages = data.pages;
+      currentPage = Math.min(data.currentPage || 0, pages.length-1);
+    }
+  } catch (err) {
+    console.warn("تعذر استرجاع المشروع المحلي", err);
+  }
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function exportPNG() {
+  render();
+  canvas.toBlob(blob => {
+    if (blob) downloadBlob(blob, "ROBOKIDS-whiteboard.png");
+  }, "image/png");
+}
+
+function exportProject() {
+  const data = JSON.stringify({pages,currentPage}, null, 2);
+  downloadBlob(
+    new Blob([data], {type:"application/json"}),
+    "ROBOKIDS-project.json"
+  );
+}
+
+document.getElementById("imageFile").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    alert("اختر ملف صورة صالحًا.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      snapshot();
+      const maxWidth = canvas.clientWidth * 0.6;
+      const scale = Math.min(1, maxWidth / img.width);
+      currentElements().push({
+        type:"image",
+        src:reader.result,
+        x:40, y:40,
+        w:img.width*scale,
+        h:img.height*scale
+      });
+      finishChange();
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = "";
+});
+
+document.getElementById("projectFile").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!Array.isArray(data.pages) || !data.pages.length) {
+        throw new Error("صيغة المشروع غير صحيحة");
+      }
+      pages = data.pages;
+      currentPage = Math.min(data.currentPage || 0, pages.length-1);
+      undoStack = [];
+      redoStack = [];
+      finishChange();
+    } catch(err) {
+      alert("تعذر فتح المشروع. تأكد من اختيار ملف ROBOKIDS JSON صحيح.");
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
+
+sizeInput.addEventListener("input", () => {
+  document.getElementById("sizeValue").textContent = sizeInput.value + " px";
+});
+
+canvas.addEventListener("pointerdown", pointerDown);
+canvas.addEventListener("pointermove", pointerMove);
+canvas.addEventListener("pointerup", pointerUp);
+canvas.addEventListener("pointercancel", pointerUp);
+
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.key.toLowerCase() === "z") {
+    e.preventDefault(); undo();
+  }
+  if (e.ctrlKey && e.key.toLowerCase() === "y") {
+    e.preventDefault(); redo();
+  }
+});
+
+loadLocal();
+resizeCanvas();
+</script>
+
+</body>
+</html>
